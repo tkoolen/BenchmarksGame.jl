@@ -9,7 +9,7 @@ using Printf
 A(i,j) = @fastmath 1.0 / ((i+j)*(i+j+1.0)/2.0+i+1.0)
 
 @inline function Au!(w, u)
-    let n = length(u)
+    let n = length(u) # because of https://github.com/JuliaLang/julia/issues/15276
         Threads.@threads for i = 1:n
             w[i] = 0
             z = 0.0
@@ -22,7 +22,7 @@ A(i,j) = @fastmath 1.0 / ((i+j)*(i+j+1.0)/2.0+i+1.0)
 end
 
 @inline function Atu!(v, w)
-    let n = length(w)
+    let n = length(w) # because of https://github.com/JuliaLang/julia/issues/15276
         Threads.@threads for i = 1:n
             z = 0.0
             @simd for j = 1:n
@@ -37,7 +37,7 @@ function perf_spectralnorm(n::Int=100)
     u = ones(Float64, n)
     v = zeros(Float64 ,n)
     w = zeros(Float64, n)
-    vv = vBv = 0
+    vv = vBv = 0.0
     for i = 1:10
         Au!(w, u)
         Atu!(v, w)
