@@ -9,25 +9,27 @@ using Printf
 A(i,j) = @fastmath 1.0 / ((i+j)*(i+j+1.0)/2.0+i+1.0)
 
 @inline function Au!(w, u)
-    n = length(u)
-    Threads.@threads for i = 1:n
-        w[i] = 0
-        z = 0.0
-        @simd for j = 1:n
-           @inbounds z += A(i-1, j-1) * u[j]
+    let n = length(u)
+        Threads.@threads for i = 1:n
+            w[i] = 0
+            z = 0.0
+            @simd for j = 1:n
+                @inbounds z += A(i-1, j-1) * u[j]
+            end
+            w[i] = z
         end
-        w[i] = z
     end
 end
 
 @inline function Atu!(v, w)
-    n = length(w)
-    Threads.@threads for i = 1:n
-        z = 0.0
-        @simd for j = 1:n
-           @inbounds z += A(j-1,i-1) * w[j]
+    let n = length(w)
+        Threads.@threads for i = 1:n
+            z = 0.0
+            @simd for j = 1:n
+                @inbounds z += A(j-1,i-1) * w[j]
+            end
+            v[i] = z
         end
-        v[i] = z
     end
 end
 
